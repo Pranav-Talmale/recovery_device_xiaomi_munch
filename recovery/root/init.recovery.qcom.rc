@@ -36,6 +36,33 @@ on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
 
+# For Haptics
+on fs 
+    chown system system /sys/bus/i2c/drivers/aw8697_haptic/2-005a/f0_save
+    chown system system /sys/bus/i2c/drivers/aw8697_haptic/2-005a/osc_save
+    chown system system /sys/bus/i2c/drivers/aw8697_haptic/3-005a/osc_save
+    chown system system /sys/bus/i2c/drivers/aw8697_haptic/2-005a/custom_wave
+    chmod 0666  /sys/bus/i2c/drivers/aw8697_haptic/2-005a/custom_wave
+    chown system system /sys/bus/i2c/drivers/aw8697_haptic/2-005a/custom_wave
+    chmod 0666  /sys/bus/i2c/drivers/aw8697_haptic/2-005a/custom_wave
+    chown system system /sys/bus/i2c/drivers/aw8697_haptic/3-005a/custom_wave
+    chmod 0666  /sys/bus/i2c/drivers/aw8697_haptic/3-005a/custom_wave
+    chmod 0666 /sys/class/qcom-haptics/lra_calibration
+    chown system system /sys/bus/i2c/drivers/aw8697_haptic/0-005a/custom_wave
+    chmod 0666  /sys/bus/i2c/drivers/aw8697_haptic/0-005a/custom_wave
+    chmod 0666 /sys/class/qcom-haptics/lra_impedance
+    chown system system /sys/bus/i2c/drivers/awinic_haptic/3-005a/f0_save
+    chown system system /sys/bus/i2c/drivers/awinic_haptic/3-005a/osc_save
+    chown system system /sys/bus/i2c/drivers/awinic_haptic/3-005a/custom_wave
+    chmod 0666  /sys/bus/i2c/drivers/awinic_haptic/3-005a/custom_wave
+    chown system system /sys/bus/i2c/drivers/awinic_haptic/3-005a/f0_value
+    chmod 0666  /sys/bus/i2c/drivers/awinic_haptic/3-005a/f0_value
+    chown system system /sys/bus/i2c/drivers/awinic_haptic/3-005a/nv_flag
+    chmod 0666  /sys/bus/i2c/drivers/awinic_haptic/3-005a/nv_flag
+    chmod 0666  /sys/bus/i2c/drivers/aw8697_haptic/5-005a/custom_wave
+    chmod 0666  /sys/bus/i2c/drivers/awinic_haptic/5-005a/custom_wave
+
+
 on post-fs
     start boot-hal-1-1
     
@@ -43,6 +70,7 @@ on boot
     chmod 0777 /system/bin/unified-script.sh
     start unified-script
     start health-hal-2-1
+	start vendor.qti.vibrator
     setprop sys.usb.config adb
 
 service unified-script /system/bin/unified-script.sh
@@ -51,3 +79,10 @@ service unified-script /system/bin/unified-script.sh
     disabled
     oneshot
     seclabel u:r:recovery:s0 
+	
+service vendor.qti.vibrator /system/bin/vendor.qti.hardware.vibrator.service
+    user root
+    group root
+    disabled
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    seclabel u:r:recovery:s0
