@@ -36,29 +36,35 @@ BOARD_VENDOR := xiaomi
 # Kernel
 BOARD_BOOT_HEADER_VERSION := 3
 BOARD_KERNEL_PAGESIZE := 4096
+BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
 BOARD_KERNEL_BASE          := 0x00000000
-BOARD_RAMDISK_OFFSET       := 0x02000000
+BOARD_RAMDISK_OFFSET       := 0x01000000
 BOARD_KERNEL_TAGS_OFFSET   := 0x00000100
 BOARD_DTB_OFFSET           := 0x01f00000
 BOARD_KERNEL_OFFSET        := 0x00008000
 
-BOARD_KERNEL_IMAGE_NAME := Image
+BOARD_KERNEL_IMAGE_NAME := kernel
+BOARD_INCLUDE_RECOVERY_DTBO := true
+BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 
-VENDOR_CMDLINE := "console=ttyMSM0,115200n8 \
-		androidboot.hardware=qcom \
-		androidboot.console=ttyMSM0 \
-		androidboot.memcg=1 \
-		lpm_levels.sleep_disabled=1 \
-		video=vfb:640x400,bpp=32,memsize=3072000 \
-		msm_rtb.filter=0x237 \
-		service_locator.enable=1 \
-		androidboot.usbcontroller=a600000.dwc3 \
-		swiotlb=2048 \
-		loop.max_part=7 \
-		cgroup.memory=nokmem,nosocket \
-		reboot=panic_warm \
-		androidboot.init_fatal_reboot_target=recovery"
+VENDOR_CMDLINE := "androidboot.verifiedbootstate=green 
+                   androidboot.vbmeta.device_state=locked \
+                   console=ttyMSM0,115200n8 \
+                   androidboot.console=ttyMSM0 \
+                   printk.devkmsg=on \
+                   androidboot.hardware=gourami \
+                   androidboot.hardware.platform=sm8250 \
+                   msm_rtb.filter=0x237 \
+                   ehci-hcd.park=3 \
+                   service_locator.enable=1 \
+                   androidboot.memcg=1 \
+                   cgroup.memory=nokmem \
+                   lpm_levels.sleep_disabled=1 \
+                   usbcore.autosuspend=7 \
+                   androidboot.usbcontroller=a600000.dwc3 \
+                   swiotlb=2048 loop.max_part=7"
+
 
 BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
 BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
@@ -67,12 +73,15 @@ BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
 BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --vendor_cmdline $(VENDOR_CMDLINE)
 
 # Kernel
 # -----------------------------------------------------
+TARGET_FORCE_PREBUILT_KERNEL := true
 KERNEL_PATH := $(DEVICE_PATH)/prebuilt
-TARGET_PREBUILT_KERNEL := $(KERNEL_PATH)/Image.gz-dtb
+TARGET_PREBUILT_KERNEL := $(KERNEL_PATH)/kernel
 BOARD_PREBUILT_DTBOIMAGE := $(KERNEL_PATH)/dtbo.img
+BOARD_PREBUILT_DTBIMAGE_DIR := $(KERNEL_PATH)/dtbs
 # -----------------------------------------------------
 
 # 12.1 manifest requirements
@@ -82,8 +91,10 @@ BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 BUILD_BROKEN_MISSING_REQUIRED_MODULES := true # may not really be needed
 
 #A/B
-BOARD_USES_RECOVERY_AS_BOOT := true
+BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
+BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
+TARGET_NO_RECOVERY := true
 AB_OTA_UPDATER := true
 
 # Metadata
@@ -112,12 +123,12 @@ TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 TARGET_USES_MKE2FS := true
 
 # AVB
-BOARD_AVB_ENABLE := true
-BOARD_AVB_VBMETA_SYSTEM := system
+BOARD_AVB_VBMETA_SYSTEM := system system_ext product
 BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flag 3
 
 # TWRP specific build flags
 TW_THEME := portrait_hdpi

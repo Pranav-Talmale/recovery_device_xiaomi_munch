@@ -5,6 +5,7 @@
 #
 
 DEVICE_PATH := device/xiaomi/munch
+KERNEL_PATH := $(DEVICE_PATH)/prebuilt
 
 # fscrypt policy
 TW_USE_FSCRYPT_POLICY := 2
@@ -15,15 +16,20 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 # Enable updating of APEXes
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 
-# Enable virtual A/B OTA
-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
+# Enable VAB compression
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression.mk)
 
 # Installs gsi keys into ramdisk, to boot a developer GSI with verified boot.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
 
 # API
 PRODUCT_TARGET_VNDK_VERSION := 31
-PRODUCT_SHIPPING_API_LEVEL := 30
+PRODUCT_SHIPPING_API_LEVEL := 31
+BOARD_SHIPPING_API_LEVEL := 31
+
+# Dynamic partitions
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+PRODUCT_USE_DYNAMIC_PARTITION_SIZE := true
 
 # A/B
 ENABLE_VIRTUAL_AB := true
@@ -42,36 +48,55 @@ AB_OTA_PARTITIONS += \
     vendor_boot
 
 PRODUCT_PACKAGES += \
+    tune2fs.vendor_ramdisk \
+    resize2fs.vendor_ramdisk
+
+PRODUCT_PACKAGES += \
     otapreopt_script \
-    checkpoint_gc \
+    cppreopts.sh \
     update_engine \
-    update_engine_sideload \
     update_verifier
+
+PRODUCT_PACKAGES += \
+    update_engine_sideload
+
+# Userdata Checkpointing OTA GC
+PRODUCT_PACKAGES += \
+    checkpoint_gc
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.cp_system_other_odex=1
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
     POSTINSTALL_PATH_system=system/bin/otapreopt_script \
     FILESYSTEM_TYPE_system=ext4 \
     POSTINSTALL_OPTIONAL_system=true
+
+AB_OTA_POSTINSTALL_CONFIG += \
+    RUN_POSTINSTALL_vendor=true \
+    POSTINSTALL_PATH_vendor=bin/checkpoint_gc \
+    FILESYSTEM_TYPE_vendor=ext4 \
+    POSTINSTALL_OPTIONAL_vendor=true
     
+# Boot control HAL
 PRODUCT_PACKAGES += \
-    android.hardware.boot@1.1-impl-qti \
-    android.hardware.boot@1.1-impl-qti.recovery \
-    android.hardware.boot@1.1-service \
-    bootctrl.kona \
-    bootctrl.kona.recovery
+    android.hardware.boot@1.2-impl-pixel-legacy \
+    android.hardware.boot@1.2-impl-pixel-legacy.recovery \
+    android.hardware.boot@1.2-service \
+    bootctrl.gourami \
+    bootctrl.gourami.recovery
 	
 PRODUCT_PACKAGES_DEBUG += \
     bootctl	
-
-# Dynamic partitions
-PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 # fastbootd
 PRODUCT_PACKAGES += \
     android.hardware.fastboot@1.0-impl-mock \
     android.hardware.fastboot@1.0-impl-mock.recovery \
     fastbootd 
+
+BOARD_BUILD_VENDOR_RAMDISK_IMAGE := true
 
 # Qcom decryption
 PRODUCT_PACKAGES += \
@@ -81,6 +106,9 @@ PRODUCT_PACKAGES += \
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
     vendor/qcom/opensource/commonsys-intf/display
+
+# Prebuilt headers
+PRODUCT_VENDOR_KERNEL_HEADERS := $(KERNEL_PATH)/kernel-headers
 
 # Crypto
 TW_INCLUDE_CRYPTO := true
