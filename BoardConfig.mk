@@ -71,7 +71,7 @@ BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 # Kernel
 # -----------------------------------------------------
 KERNEL_PATH := $(DEVICE_PATH)/prebuilt
-TARGET_PREBUILT_KERNEL := $(KERNEL_PATH)/Image.gz-dtb
+TARGET_PREBUILT_KERNEL := $(KERNEL_PATH)/Image
 BOARD_PREBUILT_DTBOIMAGE := $(KERNEL_PATH)/dtbo.img
 # -----------------------------------------------------
 
