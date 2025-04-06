@@ -49,9 +49,9 @@ Clone the kernel:
 git clone https://github.com/AOSPA/android_kernel_xiaomi_sm8250 --depth=1 kernel/xiaomi/munch
 ```
 
-Lunch command :
+Lunch command (For fox_14.1 manifest specifically):
 ```
-lunch twrp_munch-eng && mka adbd bootimage
+lunch twrp_munch-ap2a-eng && mka adbd bootimage
 ```
 
 
