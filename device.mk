@@ -1,3 +1,10 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (C) 2022-2025 The OrangeFox Recovery Project
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 # Our various search paths for Soong namespaces
 MIKONA_SOONG_PATHS := device/xiaomi/munch #device/xiaomi/sm8250-common # device/xiaomi/mikona device/xiaomi/munch
 
@@ -58,8 +65,6 @@ PRODUCT_PACKAGES += \
     android.hardware.boot@1.1-service \
     bootctrl.xiaomi_sm8250.recovery \
     android.hardware.boot@1.1-impl-qti.recovery
-#    bootctrl.kona \
-#    bootctrl.kona.recovery
 
 PRODUCT_PACKAGES += \
     otapreopt_script \
