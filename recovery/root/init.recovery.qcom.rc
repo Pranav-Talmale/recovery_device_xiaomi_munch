@@ -68,8 +68,6 @@ on post-fs
     
 on boot
     chmod 0777 /system/bin/unified-script.sh
-    chmod 0777 /system/bin/healthy-boot.sh
-    start healthy-boot
     start unified-script
     start health-hal-2-1
 	start vendor.qti.vibrator
@@ -82,12 +80,6 @@ service unified-script /system/bin/unified-script.sh
     oneshot
     seclabel u:r:recovery:s0 
 
-service healthy-boot /system/bin/healthy-boot.sh
-    user root
-    group root
-    disabled
-    oneshot
-    seclabel u:r:recovery:s0
 	
 service vendor.qti.vibrator /system/bin/vendor.qti.hardware.vibrator.service
     user root
@@ -95,3 +87,4 @@ service vendor.qti.vibrator /system/bin/vendor.qti.hardware.vibrator.service
     disabled
     setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
     seclabel u:r:recovery:s0
+
