@@ -117,3 +117,8 @@ PRODUCT_PACKAGES += \
 # OEM otacert
 PRODUCT_EXTRA_RECOVERY_KEYS += \
     vendor/recovery/security/miui
+
+# skip some snapshot stuff in update_engine
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.virtual_ab.skip_snapshot_creation=true
+
